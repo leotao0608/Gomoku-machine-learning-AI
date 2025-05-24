@@ -85,4 +85,4 @@ Represents game states for AI decision-making.
    - Displays thinking time and chosen move.  
 
 3. **Winning**:  
-   - The first player to align 5 stones wins.  
+   - The first player to align 5 chess pieces wins.  
