@@ -1,8 +1,8 @@
 #include<iostream>
 #include<string>
 #include<vector>
-#include <chrono>
-#include <thread>
+#include<chrono>
+#include<thread>
 #include<tuple>
 #include<map>
 #include<random>
@@ -10,7 +10,7 @@
 #include<set>
 #include<climits>
 using namespace std;
-
+int balence_coefficient;
 class chessBoard{
 private:
 	int size;
@@ -246,7 +246,7 @@ public:
 					if(checkBoundary(prev_x,prev_y) && board[prev_x][prev_y]==cp){
 						continue;
 					}
-					
+	
 					if(board[i][j]==evaluate_player){
 						evaluate_player_score+=isFiveInRow(i,j,dir);
 						evaluate_player_score+=isLiveFour(i,j,dir);
@@ -269,7 +269,7 @@ public:
 		}
 		
 		// Defense is more important than offense
-		int total_score=evaluate_player_score - enemy_player_score * 1.1;
+		int total_score=evaluate_player_score - enemy_player_score * balence_coefficient;
 		current_score=total_score;
 		return total_score;
 	}
@@ -511,6 +511,7 @@ pair<int, int> AIBestMove(vector<vector<int>> board, int current_player, int sea
 }
 
 int main(){
+	balence_coefficient = 1;	//smaller than 1, more offensive tendency; Larger than 1, more defensice tendency
 	const int board_size = 15;
 	const int search_depth = 3;  // Search depth, adjustable based on performance
 	int current_player = 1;      // 1: black(X), -1: white(O)
@@ -531,7 +532,7 @@ int main(){
 		steps++;
 		
 		if(board.current_player == 1){  // Player's turn
-			cout<<endl<<"=== Player's Turn ==="<<endl;
+			cout<<endl<<" --- Player's Turn ---"<<endl;
 			input = board.takeInput();
 			input_x = input.first;
 			input_y = input.second;
