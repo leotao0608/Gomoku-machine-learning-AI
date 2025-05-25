@@ -9,8 +9,13 @@
 #include<algorithm>
 #include<set>
 #include<climits>
+#include<fstream>
+#include<sstream>
+#include "json.hpp"
 using namespace std;
+using json = nlohmann::json;
 int balence_coefficient;
+
 class chessBoard{
 private:
 	int size;
@@ -75,7 +80,7 @@ public:
 		printBoard();
 		string winning_player=(player==1)?"black":"white";
 		cout<<endl<<winning_player<<" wins!"<<endl;
-		exit(0);
+		//exit(0);																		//DON'T EXIT
 	}
 	void switchPlayer(){current_player*=-1;}
 	void printParameters(){
@@ -187,6 +192,41 @@ public:
 		return false;
 	}
 	
+	// 新增：检查是否可以立即获胜
+	pair<int,int> findWinningMove(int cp){
+		for(int i=0;i<size;i++){
+			for(int j=0;j<size;j++){
+				if(board[i][j]==0){
+					board[i][j]=cp;
+					if(GameOver(cp)){
+						board[i][j]=0;
+						return make_pair(i,j);
+					}
+					board[i][j]=0;
+				}
+			}
+		}
+		return make_pair(-1,-1);
+	}
+	
+	// 新增：检查是否需要立即防守
+	pair<int,int> findBlockingMove(int cp){
+		int enemy = -cp;
+		for(int i=0;i<size;i++){
+			for(int j=0;j<size;j++){
+				if(board[i][j]==0){
+					board[i][j]=enemy;
+					if(GameOver(enemy)){
+						board[i][j]=0;
+						return make_pair(i,j);
+					}
+					board[i][j]=0;
+				}
+			}
+		}
+		return make_pair(-1,-1);
+	}
+	
 	vector<pair<int,int>> getValidMoves(){
 		vector<pair<int,int>> moves;
 		set<pair<int,int>> candidate_moves;
@@ -221,10 +261,10 @@ public:
 	
 	int evaluateBoard(int evaluate_player){
 		if(GameOver(evaluate_player)){
-			return 100000;
+			return 1000000;
 		}
 		if(GameOver(-evaluate_player)){
-			return -100000;
+			return -1000000;
 		}
 		
 		int enemy_player=evaluate_player*-1;
@@ -249,20 +289,14 @@ public:
 	
 					if(board[i][j]==evaluate_player){
 						evaluate_player_score+=isFiveInRow(i,j,dir);
-						evaluate_player_score+=isLiveFour(i,j,dir);
-						evaluate_player_score+=isThreatFour(i,j,dir);
-						evaluate_player_score+=isLiveThree(i,j,dir);
-						evaluate_player_score+=isThreatThree(i,j,dir);
-						evaluate_player_score+=isLiveTwo(i,j,dir);
-						evaluate_player_score+=isThreatTwo(i,j,dir);
+						evaluate_player_score+=isFour(i,j,dir);  // 修改：统一处理四子
+						evaluate_player_score+=isThree(i,j,dir); // 修改：统一处理三子
+						evaluate_player_score+=isTwo(i,j,dir);   // 修改：统一处理二子
 					}else if(board[i][j]==enemy_player){
 						enemy_player_score+=isFiveInRow(i,j,dir);
-						enemy_player_score+=isLiveFour(i,j,dir);
-						enemy_player_score+=isThreatFour(i,j,dir);
-						enemy_player_score+=isLiveThree(i,j,dir);
-						enemy_player_score+=isThreatThree(i,j,dir);
-						enemy_player_score+=isLiveTwo(i,j,dir);
-						enemy_player_score+=isThreatTwo(i,j,dir);
+						enemy_player_score+=isFour(i,j,dir);
+						enemy_player_score+=isThree(i,j,dir);
+						enemy_player_score+=isTwo(i,j,dir);
 					}
 				}
 			}
@@ -285,142 +319,120 @@ public:
 			j+=direction[dir][1];
 		}
 		if(count>=5){
-			return 100000;
+			return 1000000;
 		}
 		return 0;
 	}
 	
-	int isLiveFour(int x, int y, int dir){
-		int i=x-direction[dir][0],j=y-direction[dir][1];
-		if(checkBoundary(i,j)&&board[i][j]!=0){
-			return 0;
-		}
+	// 修改：统一的四子评估函数
+	int isFour(int x, int y, int dir){
 		int cp=board[x][y];
 		int count=1;
-		i=x+direction[dir][0];
-		j=y+direction[dir][1];
+		
+		// 计算连续子数
+		int i=x+direction[dir][0];
+		int j=y+direction[dir][1];
 		while(checkBoundary(i,j)&&board[i][j]==cp){
+			count++;
 			i+=direction[dir][0];
 			j+=direction[dir][1];
-			count++;
 		}
-		if(count==4&&checkBoundary(i,j)&&board[i][j]==0){
-			return 50000;
+		
+		if(count==4){
+			// 检查两端是否有空位
+			bool front_empty = false, back_empty = false;
+			
+			// 检查前端
+			int front_x = x-direction[dir][0];
+			int front_y = y-direction[dir][1];
+			if(checkBoundary(front_x,front_y) && board[front_x][front_y]==0){
+				front_empty = true;
+			}
+			
+			// 检查后端
+			if(checkBoundary(i,j) && board[i][j]==0){
+				back_empty = true;
+			}
+			
+			if(front_empty && back_empty){
+				return 100000; // 活四
+			}else if(front_empty || back_empty){
+				return 70000;  // 冲四
+			}
 		}
 		return 0;
 	}
 	
-	int isThreatFour(int x, int y, int dir){
-		bool front=false, tail=false;
-		int i=x-direction[dir][0],j=y-direction[dir][1];
-		if(checkBoundary(i,j)&&board[i][j]==0){
-			front=true;
-		}
+	int isThree(int x, int y, int dir){
 		int cp=board[x][y];
 		int count=1;
-		i=x+direction[dir][0];
-		j=y+direction[dir][1];
+		
+		int i=x+direction[dir][0];
+		int j=y+direction[dir][1];
 		while(checkBoundary(i,j)&&board[i][j]==cp){
+			count++;
 			i+=direction[dir][0];
 			j+=direction[dir][1];
-			count++;
 		}
-		if(checkBoundary(i,j)&&board[i][j]==0){
-			tail=true;
-		}
-		if(count==4&&((front&&!tail)||(!front&&tail))){
-			return 10000;
+		
+		if(count==3){
+			bool front_empty = false, back_empty = false;
+			
+			int front_x = x-direction[dir][0];
+			int front_y = y-direction[dir][1];
+			if(checkBoundary(front_x,front_y) && board[front_x][front_y]==0){
+				front_empty = true;
+			}
+			
+			if(checkBoundary(i,j) && board[i][j]==0){
+				back_empty = true;
+			}
+			
+			if(front_empty && back_empty){
+				return 5000;
+			}else if(front_empty || back_empty){
+				return 1000; // 眠三
+			}
 		}
 		return 0;
 	}
 	
-	int isLiveThree(int x, int y, int dir){
-		int i=x-direction[dir][0],j=y-direction[dir][1];
-		if(checkBoundary(i,j)&&board[i][j]!=0){
-			return 0;
-		}
+	// 修改：统一的二子评估函数
+	int isTwo(int x, int y, int dir){
 		int cp=board[x][y];
 		int count=1;
-		i=x+direction[dir][0];
-		j=y+direction[dir][1];
+		
+		int i=x+direction[dir][0];
+		int j=y+direction[dir][1];
 		while(checkBoundary(i,j)&&board[i][j]==cp){
+			count++;
 			i+=direction[dir][0];
 			j+=direction[dir][1];
-			count++;
 		}
-		if(count==3&&checkBoundary(i,j)&&board[i][j]==0){
-			return 5000;
+		
+		if(count==2){
+			bool front_empty = false, back_empty = false;
+			
+			int front_x = x-direction[dir][0];
+			int front_y = y-direction[dir][1];
+			if(checkBoundary(front_x,front_y) && board[front_x][front_y]==0){
+				front_empty = true;
+			}
+			
+			if(checkBoundary(i,j) && board[i][j]==0){
+				back_empty = true;
+			}
+			
+			if(front_empty && back_empty){
+				return 500; // 活二
+			}else if(front_empty || back_empty){
+				return 100; // 眠二
+			}
 		}
 		return 0;
 	}
 	
-	int isThreatThree(int x, int y, int dir){
-		bool front=false, tail=false;
-		int i=x-direction[dir][0],j=y-direction[dir][1];
-		if(checkBoundary(i,j)&&board[i][j]==0){
-			front=true;
-		}
-		int cp=board[x][y];
-		int count=1;
-		i=x+direction[dir][0];
-		j=y+direction[dir][1];
-		while(checkBoundary(i,j)&&board[i][j]==cp){
-			i+=direction[dir][0];
-			j+=direction[dir][1];
-			count++;
-		}
-		if(checkBoundary(i,j)&&board[i][j]==0){
-			tail=true;
-		}
-		if(count==3&&((front&&!tail)||(!front&&tail))){
-			return 1000;
-		}
-		return 0;
-	}
-	
-	int isLiveTwo(int x, int y, int dir){
-		int i=x-direction[dir][0],j=y-direction[dir][1];
-		if(checkBoundary(i,j)&&board[i][j]!=0){
-			return 0;
-		}
-		int cp=board[x][y];
-		int count=1;
-		i=x+direction[dir][0];
-		j=y+direction[dir][1];
-		while(checkBoundary(i,j)&&board[i][j]==cp){
-			i+=direction[dir][0];
-			j+=direction[dir][1];
-			count++;
-		}
-		if(count==2&&checkBoundary(i,j)&&board[i][j]==0){
-			return 500;
-		}
-		return 0;
-	}
-	
-	int isThreatTwo(int x, int y, int dir){
-		bool front=false, tail=false;
-		int i=x-direction[dir][0],j=y-direction[dir][1];
-		if(checkBoundary(i,j)&&board[i][j]==0){
-			front=true;
-		}
-		int cp=board[x][y];
-		int count=1;
-		i=x+direction[dir][0];
-		j=y+direction[dir][1];
-		while(checkBoundary(i,j)&&board[i][j]==cp){
-			i+=direction[dir][0];
-			j+=direction[dir][1];
-			count++;
-		}
-		if(checkBoundary(i,j)&&board[i][j]==0){
-			tail=true;
-		}
-		if(count==2&&((front&&!tail)||(!front&&tail))){
-			return 100;
-		}
-		return 0;
-	}
+	// 删除原来的重复函数
 };
 
 // MinMax algorithm + Alpha-Beta pruning
@@ -481,10 +493,24 @@ int alphaBetaMinMax(Node node, int depth, int alpha, int beta, bool maximizing_p
 
 pair<int, int> AIBestMove(vector<vector<int>> board, int current_player, int search_depth){
 	Node node(board, current_player);
-	vector<pair<int,int>> valid_moves = node.getValidMoves();
 	
-	int best_score = INT_MIN;
-	pair<int, int> best_move = {-1, -1};
+	// 首先检查是否可以立即获胜
+	pair<int,int> winning_move = node.findWinningMove(current_player);
+	if(winning_move.first != -1){
+		cout << "AI: (" << winning_move.first << "," << winning_move.second << ")" << endl;
+		return winning_move;
+	}
+	
+	// 然后检查是否需要立即防守
+	pair<int,int> blocking_move = node.findBlockingMove(current_player);
+	if(blocking_move.first != -1){
+		cout << "AI: (" << blocking_move.first << "," << blocking_move.second << ")" << endl;
+		return blocking_move;
+	}
+	
+	vector<pair<int,int>> valid_moves = node.getValidMoves();
+	vector<tuple<int,int,int>> best_move_score;
+	int select_groups=3; // 增加选择范围
 	
 	for(auto move : valid_moves){
 		int x = move.first, y = move.second;
@@ -497,58 +523,174 @@ pair<int, int> AIBestMove(vector<vector<int>> board, int current_player, int sea
 		
 		// Undo move
 		node.board[x][y] = 0;
-		
-		if(score > best_score){
-			best_score = score;
-			best_move = move;
-		}
+		best_move_score.push_back({move.first,move.second, score});
 	}
 	
-	cout<<"AI best move score: "<<best_score<<endl;
-	return best_move;
+	sort(best_move_score.begin(), best_move_score.end(), [](const auto& a, const auto& b) {
+        return get<2>(a) > get<2>(b); 
+    });
+    
+    // 如果最佳分数明显高于其他选项，直接选择
+    if(best_move_score.size() > 1 && get<2>(best_move_score[0]) - get<2>(best_move_score[1]) >= 10000){
+    	cout << "AI best move: " << get<2>(best_move_score[0]) - get<2>(best_move_score[1]) << endl;
+    	return make_pair(get<0>(best_move_score[0]),get<1>(best_move_score[0]));
+	}
+	
+    select_groups=min(select_groups,int(best_move_score.size()));
+    random_device rd;
+	mt19937 gen(rd());  
+    uniform_int_distribution<> dis(0,select_groups-1); 
+    int index=dis(gen);
+	return make_pair(get<0>(best_move_score[index]),get<1>(best_move_score[index]));
+}
+
+struct FlatGameRecord {
+    vector<int> flat_board;// 255 size
+    int player;             // 1 / -1
+    int move_x, move_y;   
+    int result;          //1 win; -1 lose; 0 tie
+    int steps;
+};
+
+void saveToJson(const vector<FlatGameRecord>& data, const string& filename) {
+    json j_array = json::array();
+    for (const auto& rec : data) {
+        json j;
+        j["board"] = rec.flat_board;
+        j["player"] = rec.player;
+        j["move"] = {rec.move_x, rec.move_y};
+        j["result"] = rec.result;
+        j["steps"] = rec.steps;
+        j_array.push_back(j);
+    }
+    ofstream out(filename);
+    out << j_array.dump(2); // pretty print
 }
 
 int main(){
-	balence_coefficient = 1;	//smaller than 1, more offensive tendency; Larger than 1, more defensice tendency
+	balence_coefficient = 1.5;
 	const int board_size = 15;
-	const int search_depth = 2;  // Search depth, adjustable based on performance
+	const int search_depth = 3; 
 	
-	int current_player = 1;      // 1: black(X), -1: white(O)
-	chessBoard board(board_size, current_player);
 
-	board.printBoard();
-	for(int i=0;i<1000;i++){
+	
+	for(int i=0;i<10;i++){							//number of games played
+		int current_player = 1;  
+		chessBoard board(board_size, current_player);
+		board.printBoard();
 		pair<int,int> input;
 		int input_x, input_y;
 		int steps = 0;
 		
+		vector<FlatGameRecord> game_history;
+		
 		while(1){
+			FlatGameRecord record;
+			record.flat_board.clear();
 			steps++;
-			if(board.current_player == 1){  // Player's turn
+			vector<vector<int>> b = board.getBoard();  // current board
+			for (const auto& row : b) {
+				for (int cell : row) {
+					record.flat_board.push_back(cell); // flatten board
+				}
+			}
+			if(board.current_player == 1){  // AI 1 
+				
 				if(steps==1){
 					board.placeAMove(7, 7);
+					/*----------*/
+					record.player = board.current_player;
+					record.move_x = 7;
+					record.move_y = 7;
+					record.result = 0; 
+					record.steps = steps;
+					game_history.push_back(record);
+					/*---------*/
 				}else{
-					pair<int, int> AI_move = AIBestMove(board.getBoard(), board.current_player, 1);//depth
+					pair<int, int> AI_move = AIBestMove(board.getBoard(), board.current_player, search_depth);
 					board.placeAMove(AI_move.first, AI_move.second);
+					/*-----------*/
+					
+					record.player = board.current_player;
+					record.move_x = AI_move.first;
+					record.move_y = AI_move.second;
+					record.result = 0; 
+					record.steps = steps;
+					game_history.push_back(record);
+					/*-----------*/
 					if(!board.checkStatus(AI_move.first, AI_move.second)){
+						/*--------*/
+						int winner = board.current_player;
+						for (auto& r : game_history) {
+						    if (winner == 0) {
+						        r.result = 0;  // 平局
+						    } else {
+						        r.result = (r.player == winner) ? 1 : -1;
+						    }
+						}
+						/*-------*/	
+						saveToJson(game_history, "selfplay_game_"+to_string(i)+".json");
+						/*-------*/					
 						break;
 					}
 				}
-				
-			}else{  // AI's turn
-				pair<int, int> AI_move = AIBestMove(board.getBoard(), board.current_player, 2);
-				board.placeAMove(AI_move.first, AI_move.second);
-				if(!board.checkStatus(AI_move.first, AI_move.second)){
-					break;
+			}else{  // AI 2
+				if(steps==2){
+					random_device rd;
+					mt19937 gen(rd());  
+				    uniform_int_distribution<> dis(-1,1); 
+					int x=dis(gen);
+					int y=dis(gen);
+					while(x==0&&y==0){
+						y=dis(gen);
+					}
+					board.placeAMove(7+x,7+y);
+					/*------------*/
+					
+					record.player = board.current_player;
+					record.move_x = 7+x;
+					record.move_y = 7+y;
+					record.result = 0; 
+					record.steps = steps;
+					game_history.push_back(record);
+					/*---------------*/
+				}else{
+					pair<int, int> AI_move = AIBestMove(board.getBoard(), board.current_player, search_depth);
+					board.placeAMove(AI_move.first, AI_move.second);
+					/*------------*/
+					
+					record.player = board.current_player;
+					record.move_x = AI_move.first;
+					record.move_y = AI_move.second;
+					record.result = 0; 
+					record.steps = steps;
+					game_history.push_back(record);
+					/*-------------*/
+					if(!board.checkStatus(AI_move.first, AI_move.second)){
+						/*--------*/
+						int winner = board.current_player;
+						for (auto& r : game_history) {
+						    if (winner == 0) {
+						        r.result = 0;  // 平局
+						    } else {
+						        r.result = (r.player == winner) ? 1 : -1;
+						    }
+						}
+						/*------*/
+						saveToJson(game_history, "selfplay_game_"+to_string(i)+".json");
+						/*-------*/
+						break;
+					}					
 				}
+
 			}
 			board.clearScreen();
 			board.printBoard();
 			board.printParameters();
 			board.switchPlayer();
 		}
+		cout << "steps: " << steps << endl << endl;
 	}
-	
 	
 	return 0;
 }
