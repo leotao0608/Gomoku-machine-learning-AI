@@ -272,8 +272,7 @@ public:
 		int total_score=evaluate_player_score - enemy_player_score * balence_coefficient;
 		current_score=total_score;
 		return total_score;
-	}
-	
+	}	
 	int isFiveInRow(int x, int y, int dir){
 		int cp=board[x][y];
 		int count=1;
@@ -511,9 +510,9 @@ pair<int, int> AIBestMove(vector<vector<int>> board, int current_player, int sea
 }
 
 int main(){
-	balence_coefficient = 1;	//smaller than 1, more offensive tendency; Larger than 1, more defensice tendency
+	balence_coefficient = 1.1;	//smaller than 1, more offensive tendency; Larger than 1, more defensice tendency; default value: 1
 	const int board_size = 15;
-	const int search_depth = 3;  // Search depth, adjustable based on performance
+	const int search_depth = 3;  // Search depth, adjustable based on performance; default value: 3
 	int current_player = 1;      // 1: black(X), -1: white(O)
 	
 	chessBoard board(board_size, current_player);
@@ -549,25 +548,37 @@ int main(){
 			}
 		}else{  // AI's turn
 			cout<<endl<<"=== AI's Turn ==="<<endl;
-			
-			auto start_time = chrono::high_resolution_clock::now();
-			pair<int, int> AI_move = AIBestMove(board.getBoard(), board.current_player, search_depth);
-			auto end_time = chrono::high_resolution_clock::now();
-			
-			auto duration = chrono::duration_cast<chrono::milliseconds>(end_time - start_time);
-			
-			if(AI_move.first == -1){
-				cout<<"No valid moves available!"<<endl;
-				break;
+			if(steps==2){
+				random_device rd;
+				mt19937 gen(rd());  
+			    uniform_int_distribution<> dis(-1,1); 
+				int x=dis(gen);
+				int y=dis(gen);
+				while(x==0&&y==0){
+					y=dis(gen);
+				}
+				board.placeAMove(input_x+x,input_y+y);
+			}else{
+				auto start_time = chrono::high_resolution_clock::now();
+				pair<int, int> AI_move = AIBestMove(board.getBoard(), board.current_player, search_depth);
+				auto end_time = chrono::high_resolution_clock::now();
+				
+				auto duration = chrono::duration_cast<chrono::milliseconds>(end_time - start_time);
+				
+				if(AI_move.first == -1){
+					cout<<"No valid moves available!"<<endl;
+					break;
+				}
+				
+				board.placeAMove(AI_move.first, AI_move.second);
+				cout<<"AI move: ("<<AI_move.first<<", "<<AI_move.second<<")"<<endl;
+				cout<<"Thinking time: "<<duration.count()<<"ms"<<endl;
+				
+				if(!board.checkStatus(AI_move.first, AI_move.second)){
+					break;
+				}
 			}
 			
-			board.placeAMove(AI_move.first, AI_move.second);
-			cout<<"AI move: ("<<AI_move.first<<", "<<AI_move.second<<")"<<endl;
-			cout<<"Thinking time: "<<duration.count()<<"ms"<<endl;
-			
-			if(!board.checkStatus(AI_move.first, AI_move.second)){
-				break;
-			}
 		}
 		
 		board.clearScreen();
