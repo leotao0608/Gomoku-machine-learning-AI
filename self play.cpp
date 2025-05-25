@@ -192,7 +192,7 @@ public:
 		return false;
 	}
 	
-	// 新增：检查是否可以立即获胜
+	// check if can win immadiately
 	pair<int,int> findWinningMove(int cp){
 		for(int i=0;i<size;i++){
 			for(int j=0;j<size;j++){
@@ -209,7 +209,7 @@ public:
 		return make_pair(-1,-1);
 	}
 	
-	// 新增：检查是否需要立即防守
+	// if need defence
 	pair<int,int> findBlockingMove(int cp){
 		int enemy = -cp;
 		for(int i=0;i<size;i++){
@@ -231,7 +231,7 @@ public:
 		vector<pair<int,int>> moves;
 		set<pair<int,int>> candidate_moves;
 		
-		// Prioritize positions around existing pieces
+		// prioritize positions around existing pieces
 		for(int i=0;i<size;i++){
 			for(int j=0;j<size;j++){
 				if(board[i][j]!=0){
@@ -247,7 +247,7 @@ public:
 			}
 		}
 		
-		// If no pieces exist, start from center
+		// if no pieces exist, start from center
 		if(candidate_moves.empty()){
 			candidate_moves.insert({size/2, size/2});
 		}
@@ -282,16 +282,16 @@ public:
 					int prev_x=i-dx;
 					int prev_y=j-dy;
 					
-					// Avoid recalculating the same line
+					// avoid recalculating the same line
 					if(checkBoundary(prev_x,prev_y) && board[prev_x][prev_y]==cp){
 						continue;
 					}
 	
 					if(board[i][j]==evaluate_player){
 						evaluate_player_score+=isFiveInRow(i,j,dir);
-						evaluate_player_score+=isFour(i,j,dir);  // 修改：统一处理四子
-						evaluate_player_score+=isThree(i,j,dir); // 修改：统一处理三子
-						evaluate_player_score+=isTwo(i,j,dir);   // 修改：统一处理二子
+						evaluate_player_score+=isFour(i,j,dir);  
+						evaluate_player_score+=isThree(i,j,dir); 
+						evaluate_player_score+=isTwo(i,j,dir);  
 					}else if(board[i][j]==enemy_player){
 						enemy_player_score+=isFiveInRow(i,j,dir);
 						enemy_player_score+=isFour(i,j,dir);
@@ -302,7 +302,7 @@ public:
 			}
 		}
 		
-		// Defense is more important than offense
+		// defense is more important than offense
 		int total_score=evaluate_player_score - enemy_player_score * balence_coefficient;
 		current_score=total_score;
 		return total_score;
@@ -324,12 +324,12 @@ public:
 		return 0;
 	}
 	
-	// 修改：统一的四子评估函数
+
 	int isFour(int x, int y, int dir){
 		int cp=board[x][y];
 		int count=1;
 		
-		// 计算连续子数
+
 		int i=x+direction[dir][0];
 		int j=y+direction[dir][1];
 		while(checkBoundary(i,j)&&board[i][j]==cp){
@@ -339,25 +339,25 @@ public:
 		}
 		
 		if(count==4){
-			// 检查两端是否有空位
+			
 			bool front_empty = false, back_empty = false;
 			
-			// 检查前端
+			
 			int front_x = x-direction[dir][0];
 			int front_y = y-direction[dir][1];
 			if(checkBoundary(front_x,front_y) && board[front_x][front_y]==0){
 				front_empty = true;
 			}
 			
-			// 检查后端
+			
 			if(checkBoundary(i,j) && board[i][j]==0){
 				back_empty = true;
 			}
 			
 			if(front_empty && back_empty){
-				return 100000; // 活四
+				return 100000;//live four
 			}else if(front_empty || back_empty){
-				return 70000;  // 冲四
+				return 70000;  // threat four
 			}
 		}
 		return 0;
@@ -391,13 +391,13 @@ public:
 			if(front_empty && back_empty){
 				return 5000;
 			}else if(front_empty || back_empty){
-				return 1000; // 眠三
+				return 1000; //threat three
 			}
 		}
 		return 0;
 	}
 	
-	// 修改：统一的二子评估函数
+
 	int isTwo(int x, int y, int dir){
 		int cp=board[x][y];
 		int count=1;
@@ -424,20 +424,19 @@ public:
 			}
 			
 			if(front_empty && back_empty){
-				return 500; // 活二
+				return 500; // live two
 			}else if(front_empty || back_empty){
-				return 100; // 眠二
+				return 100; // threat two
 			}
 		}
 		return 0;
 	}
 	
-	// 删除原来的重复函数
 };
 
 // MinMax algorithm + Alpha-Beta pruning
 int alphaBetaMinMax(Node node, int depth, int alpha, int beta, bool maximizing_player, int ai_player){
-	// Termination conditions
+	// termination conditions
 	if(depth==0 || node.GameOver(ai_player) || node.GameOver(-ai_player)){
 		return node.evaluateBoard(ai_player);
 	}
@@ -494,14 +493,14 @@ int alphaBetaMinMax(Node node, int depth, int alpha, int beta, bool maximizing_p
 pair<int, int> AIBestMove(vector<vector<int>> board, int current_player, int search_depth){
 	Node node(board, current_player);
 	
-	// 首先检查是否可以立即获胜
+	
 	pair<int,int> winning_move = node.findWinningMove(current_player);
 	if(winning_move.first != -1){
 		cout << "AI: (" << winning_move.first << "," << winning_move.second << ")" << endl;
 		return winning_move;
 	}
 	
-	// 然后检查是否需要立即防守
+
 	pair<int,int> blocking_move = node.findBlockingMove(current_player);
 	if(blocking_move.first != -1){
 		cout << "AI: (" << blocking_move.first << "," << blocking_move.second << ")" << endl;
@@ -510,7 +509,7 @@ pair<int, int> AIBestMove(vector<vector<int>> board, int current_player, int sea
 	
 	vector<pair<int,int>> valid_moves = node.getValidMoves();
 	vector<tuple<int,int,int>> best_move_score;
-	int select_groups=3; // 增加选择范围
+	int select_groups=3; 
 	
 	for(auto move : valid_moves){
 		int x = move.first, y = move.second;
@@ -530,7 +529,7 @@ pair<int, int> AIBestMove(vector<vector<int>> board, int current_player, int sea
         return get<2>(a) > get<2>(b); 
     });
     
-    // 如果最佳分数明显高于其他选项，直接选择
+
     if(best_move_score.size() > 1 && get<2>(best_move_score[0]) - get<2>(best_move_score[1]) >= 10000){
     	cout << "AI best move: " << get<2>(best_move_score[0]) - get<2>(best_move_score[1]) << endl;
     	return make_pair(get<0>(best_move_score[0]),get<1>(best_move_score[0]));
@@ -623,7 +622,7 @@ int main(){
 						int winner = board.current_player;
 						for (auto& r : game_history) {
 						    if (winner == 0) {
-						        r.result = 0;  // 平局
+						        r.result = 0;  // tie
 						    } else {
 						        r.result = (r.player == winner) ? 1 : -1;
 						    }
@@ -671,7 +670,7 @@ int main(){
 						int winner = board.current_player;
 						for (auto& r : game_history) {
 						    if (winner == 0) {
-						        r.result = 0;  // 平局
+						        r.result = 0;  // tie
 						    } else {
 						        r.result = (r.player == winner) ? 1 : -1;
 						    }
