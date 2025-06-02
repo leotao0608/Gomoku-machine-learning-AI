@@ -1,1 +1,38 @@
-
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gomoku - Five in a Row</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Gomoku - Five in a Row</h1>
+        <div class="game-info">
+            <div class="status" id="status">Black's turn (X)</div>
+            <div class="controls">
+                <button id="restart-btn">Restart Game</button>
+                <button id="ai-toggle">AI: ON</button>
+            </div>
+        </div>
+        
+        <div class="board-container">
+            <div class="board" id="board"></div>
+        </div>
+        
+        <div class="game-log">
+            <h3>Game Log</h3>
+            <div id="log" class="log-content"></div>
+        </div>
+        
+        <div class="coordinates">
+            <div>Click coordinates: (<span id="click-x">-</span>, <span id="click-y">-</span>)</div>
+            <div>Last move score: <span id="move-score">-</span></div>
+            <div>AI thinking time: <span id="ai-time">-</span>ms</div>
+        </div>
+    </div>
+    
+    <script src="script.js"></script>
+</body>
+</html>
