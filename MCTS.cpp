@@ -13,17 +13,17 @@ using namespace std;
 using namespace chrono;
 
 const double C = 1.414;  // UCB exploration parameter
-const int SIMULATIONS = 20;
-const int TOTAL_CANDIDATES = 10;  // add candidates
-const int BOARD_SIZE = 15;
+const int simulations = 20;
+const int total_candidates = 10;  // add candidates
+const int board_size = 15;
 
-const int SCORE_FIVE = 1000000;
-const int SCORE_LIVE_FOUR = 100000;
-const int SCORE_THREAT_FOUR = 50000;
-const int SCORE_LIVE_THREE = 10000;
-const int SCORE_THREAT_THREE = 5000;
-const int SCORE_LIVE_TWO = 1000;
-const int SCORE_DOUBLE_THREE = 80000;  
+const int score_five = 1000000;
+const int score_live_four = 100000;
+const int score_threat_four = 50000;
+const int score_live_three = 10000;
+const int score_threat_three = 5000;
+const int score_live_two = 1000;
+const int score_double_three = 80000;  
 
 int current_player = 1;  // 1: black turn; -1: white turn;
 vector<vector<int>> board;
@@ -38,14 +38,14 @@ int switchPlayer(int player) { return -player; }
 
 void printBoard(const vector<vector<int>>& _board) {
     cout << "   ";
-    for(int i = 0; i < BOARD_SIZE; i++) {
+    for(int i = 0; i < board_size; i++) {
         cout << (i <= 9 ? " " : "") << i << " ";
     }
     cout << "y\n";
     
-    for(int i = 0; i < BOARD_SIZE; i++) {
+    for(int i = 0; i < board_size; i++) {
         cout << (i <= 9 ? " " : "") << i << "  ";
-        for(int j = 0; j < BOARD_SIZE; j++) {
+        for(int j = 0; j < board_size; j++) {
             char c = (_board[i][j] == 0) ? '.' : (_board[i][j] == 1 ? 'X' : 'O');
             cout << c << "  ";
         }
@@ -57,7 +57,7 @@ void printBoard(const vector<vector<int>>& _board) {
 void clearBoard() { system("cls"); }
 
 bool isValidPos(int x, int y) {
-    return x >= 0 && x < BOARD_SIZE && y >= 0 && y < BOARD_SIZE;
+    return x >= 0 && x < board_size && y >= 0 && y < board_size;
 }
 
 bool errorCheck(int x, int y, const string& error_source) {
@@ -268,36 +268,36 @@ bool hasDoubleThreeThreat(int x, int y, int player, const vector<vector<int>>& _
 int evaluatePosition(int x, int y, int player, const vector<vector<int>>& _board) {
     int score = 0;
     
-    score += SCORE_FIVE * (isFiveInRow(x, y, player, _board) ? 1 : 0);
-    score += SCORE_LIVE_FOUR * countLiveFour(x, y, player, _board);
-    score += SCORE_THREAT_FOUR * countThreatFour(x, y, player, _board);
-    score += SCORE_LIVE_THREE * countLiveThree(x, y, player, _board);
-    score += SCORE_THREAT_THREE * countThreatThree(x, y, player, _board);
-    score += SCORE_LIVE_TWO * countLiveTwo(x, y, player, _board);
+    score += score_five * (isFiveInRow(x, y, player, _board) ? 1 : 0);
+    score += score_live_four * countLiveFour(x, y, player, _board);
+    score += score_threat_four * countThreatFour(x, y, player, _board);
+    score += score_live_three * countLiveThree(x, y, player, _board);
+    score += score_threat_three * countThreatThree(x, y, player, _board);
+    score += score_live_two * countLiveTwo(x, y, player, _board);
     
     if(hasDoubleThreeThreat(x, y, player, _board)) {
-        score += SCORE_DOUBLE_THREE;
+        score += score_double_three;
     }
     
     int opponent = switchPlayer(player);
-    score += SCORE_FIVE * 1.1 * (isFiveInRow(x, y, opponent, _board) ? 1 : 0);
-    score += SCORE_LIVE_FOUR * 1.1 * countLiveFour(x, y, opponent, _board);
-    score += SCORE_THREAT_FOUR * 1.0 * countThreatFour(x, y, opponent, _board);
-    score += SCORE_LIVE_THREE * 0.9 * countLiveThree(x, y, opponent, _board);  // 提高活三防守权重
-    score += SCORE_THREAT_THREE * 0.8 * countThreatThree(x, y, opponent, _board);
-    score += SCORE_LIVE_TWO * 0.6 * countLiveTwo(x, y, opponent, _board);
+    score += score_five * 1.1 * (isFiveInRow(x, y, opponent, _board) ? 1 : 0);
+    score += score_live_four * 1.1 * countLiveFour(x, y, opponent, _board);
+    score += score_threat_four * 1.0 * countThreatFour(x, y, opponent, _board);
+    score += score_live_three * 0.9 * countLiveThree(x, y, opponent, _board);  // 提高活三防守权重
+    score += score_threat_three * 0.8 * countThreatThree(x, y, opponent, _board);
+    score += score_live_two * 0.6 * countLiveTwo(x, y, opponent, _board);
     
 
     if(hasDoubleThreeThreat(x, y, opponent, _board)) {
-        score += SCORE_DOUBLE_THREE * 0.95;
+        score += score_double_three * 0.95;
     }
     
     return score;
 }
 
 int checkGameStatus(const vector<vector<int>>& _board) {
-    for(int i = 0; i < BOARD_SIZE; i++) {
-        for(int j = 0; j < BOARD_SIZE; j++) {
+    for(int i = 0; i < board_size; i++) {
+        for(int j = 0; j < board_size; j++) {
             if(_board[i][j] != 0) {
                 if(isFiveInRow(i, j, _board[i][j], _board)) {
                     return _board[i][j];  
@@ -307,8 +307,8 @@ int checkGameStatus(const vector<vector<int>>& _board) {
     }
     
     bool full = true;
-    for(int i = 0; i < BOARD_SIZE; i++) {
-        for(int j = 0; j < BOARD_SIZE; j++) {
+    for(int i = 0; i < board_size; i++) {
+        for(int j = 0; j < board_size; j++) {
             if(_board[i][j] == 0) {
                 full = false;
                 break;
@@ -323,8 +323,8 @@ int checkGameStatus(const vector<vector<int>>& _board) {
 vector<pair<int, int>> getCandidateMoves(const vector<vector<int>>& _board, int range = 2) {
     set<pair<int, int>> candidates;
     
-    for(int i = 0; i < BOARD_SIZE; i++) {
-        for(int j = 0; j < BOARD_SIZE; j++) {
+    for(int i = 0; i < board_size; i++) {
+        for(int j = 0; j < board_size; j++) {
             if(_board[i][j] != 0) {
                 for(int di = -range; di <= range; di++) {
                     for(int dj = -range; dj <= range; dj++) {
@@ -339,7 +339,7 @@ vector<pair<int, int>> getCandidateMoves(const vector<vector<int>>& _board, int 
     }
     
     if(candidates.empty()) {
-        int center = BOARD_SIZE / 2;
+        int center = board_size / 2;
         for(int i = center - 1; i <= center + 1; i++) {
             for(int j = center - 1; j <= center + 1; j++) {
                 if(isValidPos(i, j)) {
@@ -481,7 +481,7 @@ pair<int, int> mctsBestMove() {
     sort(evaluations.begin(), evaluations.end(), 
          [](const auto& a, const auto& b) { return get<2>(a) > get<2>(b); });
     
-    int num_candidates = min(TOTAL_CANDIDATES, (int)evaluations.size());
+    int num_candidates = min(total_candidates, (int)evaluations.size());
     vector<vector<int>> results(num_candidates, vector<int>(3, 0)); 
     
     cout << "Evaluating " << num_candidates << " candidates...\n";
@@ -489,7 +489,7 @@ pair<int, int> mctsBestMove() {
     for(int i = 0; i < num_candidates; i++) {
         auto [x, y, score, _] = evaluations[i];
         
-        for(int sim = 0; sim < SIMULATIONS; sim++) {
+        for(int sim = 0; sim < simulations; sim++) {
             int result = simulateGame(x, y, current_player, board);
             if(result == 1) results[i][0]++;
             else if(result == -1) results[i][1]++;
@@ -502,11 +502,11 @@ pair<int, int> mctsBestMove() {
     
     double best_ucb = -1e9;
     int best_idx = 0;
-    int total_sims = num_candidates * SIMULATIONS;
+    int total_sims = num_candidates * simulations;
     
     for(int i = 0; i < num_candidates; i++) {
-        double win_rate = (double)(results[i][0] + 0.5 * results[i][2]) / SIMULATIONS;
-        double ucb = win_rate + C * sqrt(log(total_sims) / SIMULATIONS);
+        double win_rate = (double)(results[i][0] + 0.5 * results[i][2]) / simulations;
+        double ucb = win_rate + C * sqrt(log(total_sims) / simulations);
         
         if(ucb > best_ucb) {
             best_ucb = ucb;
@@ -525,9 +525,9 @@ void updateBounds(int x, int y) {
     Max_y = max(y + 2, Max_y);
     
     Min_x = max(0, Min_x);
-    Max_x = min(BOARD_SIZE - 1, Max_x);
+    Max_x = min(board_size - 1, Max_x);
     Min_y = max(0, Min_y);
-    Max_y = min(BOARD_SIZE - 1, Max_y);
+    Max_y = min(board_size - 1, Max_y);
 }
 
 void placeMove(int x, int y, int player) {
@@ -559,7 +559,7 @@ void getPlayerInput() {
 }
 
 int main() {
-    board.resize(BOARD_SIZE, vector<int>(BOARD_SIZE, 0));
+    board.resize(board_size, vector<int>(board_size, 0));
     current_player = 1;
     
     printBoard(board);
@@ -591,7 +591,7 @@ int main() {
                 
                 if(!isValidPos(best_move.first, best_move.second) || 
                    board[best_move.first][best_move.second] != 0) {
-                    best_move = {BOARD_SIZE/2, BOARD_SIZE/2};
+                    best_move = {board_size/2, board_size/2};
                 }
             } else {
                 best_move = mctsBestMove();
