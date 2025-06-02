@@ -1,6 +1,6 @@
 // Constants - preserving original typing style
 const C = 1.414;  // UCB exploration parameter
-const simulations = 40;
+const simulations = 100;
 const total_candidates = 10;  // add candidates
 const board_size = 15;
 
