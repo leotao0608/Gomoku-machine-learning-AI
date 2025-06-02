@@ -1,6 +1,6 @@
 // Constants - preserving original typing style
 const C = 1.414;  // UCB exploration parameter
-const simulations = 20;
+const simulations = 40;
 const total_candidates = 10;  // add candidates
 const board_size = 15;
 
@@ -391,7 +391,7 @@ function simulateGame(x, y, player, _board) {
     let sim_player = switchPlayer(player);
     
     let moves = 0;
-    const MAX_MOVES = 50;
+    const MAX_MOVES = 80;
     
     while(moves < MAX_MOVES) {
         const status = checkGameStatus(sim_board);
