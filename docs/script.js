@@ -307,7 +307,6 @@ function getUrgentMove(player, _board) {
     // Check for winning moves
     for(const [x, y] of candidates) {
         if(isFiveInRow(x, y, player, _board)) {
-            addLog("urgent: five1");
             return [x, y];
         }
     }
@@ -316,7 +315,6 @@ function getUrgentMove(player, _board) {
     const opponent = switchPlayer(player);
     for(const [x, y] of candidates) {
         if(isFiveInRow(x, y, opponent, _board)) {
-            addLog("urgent: five2");
             return [x, y];
         }
     }
@@ -324,7 +322,6 @@ function getUrgentMove(player, _board) {
     // Create live four
     for(const [x, y] of candidates) {
         if(countLiveFour(x, y, player, _board) > 0) {
-            addLog("urgent: four1");
             return [x, y];
         }
     }
@@ -332,7 +329,6 @@ function getUrgentMove(player, _board) {
     // Block opponent's live four
     for(const [x, y] of candidates) {
         if(countLiveFour(x, y, opponent, _board) > 0) {
-            addLog("urgent: four2");
             return [x, y];
         }
     }
@@ -340,7 +336,6 @@ function getUrgentMove(player, _board) {
     // Create double three
     for(const [x, y] of candidates) {
         if(hasDoubleThreeThreat(x, y, player, _board)) {
-            addLog("urgent: doubethree1");
             return [x, y];
         }
     }
@@ -348,7 +343,6 @@ function getUrgentMove(player, _board) {
     // Block opponent's double three
     for(const [x, y] of candidates) {
         if(hasDoubleThreeThreat(x, y, opponent, _board)) {
-            addLog("urgent: doubethree2");
             return [x, y];
         }
     }
@@ -363,7 +357,6 @@ function getUrgentMove(player, _board) {
     // Block opponent's threat four
     for(const [x, y] of candidates) {
         if(countThreatFour(x, y, opponent, _board) > 0) {
-            addLog("urgent: threatfour2");
             return [x, y];
         }
     }
@@ -371,7 +364,6 @@ function getUrgentMove(player, _board) {
     // Create live three
     for(const [x, y] of candidates) {
         if(countLiveThree(x, y, player, _board) > 0) {
-            addLog("urgent: livethree1");
             return [x, y];
         }
     }
@@ -382,7 +374,6 @@ function getUrgentMove(player, _board) {
         const live_three_count = countLiveThree(x, y, opponent, _board);
         if(live_three_count > 0) {
             threat_moves.push([[x, y], live_three_count]);
-            addLog("urgent: livethree2");
         }
     }
     
