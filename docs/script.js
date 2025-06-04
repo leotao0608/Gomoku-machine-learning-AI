@@ -7,8 +7,8 @@ const board_size = 15;
 const score_five = 1000000;
 const score_live_four = 100000;
 const score_threat_four = 50000;
-const score_live_three = 10000;
-const score_threat_three = 5000;
+const score_live_three = 15000;
+const score_threat_three = 1500;
 const score_live_two = 1000;
 const score_double_three = 80000;
 
@@ -347,12 +347,12 @@ function getUrgentMove(player, _board) {
         }
     }
     
-    // Create threat four
-    for(const [x, y] of candidates) {
-        if(countThreatFour(x, y, player, _board) > 0) {
-            return [x, y];
-        }
-    }
+    // Create threat four  :threat fout is too prioritized, cause too much defnece
+    // for(const [x, y] of candidates) {
+    //     if(countThreatFour(x, y, player, _board) > 0) {
+    //         return [x, y];
+    //     }
+    // }
     
     // Block opponent's threat four
     for(const [x, y] of candidates) {
