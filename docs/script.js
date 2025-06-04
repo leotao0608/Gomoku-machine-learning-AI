@@ -216,9 +216,9 @@ function evaluatePosition(x, y, player, _board) {
     let score = 0;
     
     score += score_five * (isFiveInRow(x, y, player, _board) ? 1 : 0);
-    score += score_live_four * 1.1 * countLiveFour(x, y, player, _board);
+    score += score_live_four * 1.2 * countLiveFour(x, y, player, _board);
     score += score_threat_four * countThreatFour(x, y, player, _board);
-    score += score_live_three * 1.1 * countLiveThree(x, y, player, _board);
+    score += score_live_three * 1.2 * countLiveThree(x, y, player, _board);
     score += score_threat_three * countThreatThree(x, y, player, _board);
     score += score_live_two * countLiveTwo(x, y, player, _board);
     
@@ -229,9 +229,9 @@ function evaluatePosition(x, y, player, _board) {
     const opponent = switchPlayer(player);
     score += score_five * 1.1 * (isFiveInRow(x, y, opponent, _board) ? 1 : 0);
     score += score_live_four * 1.1 * countLiveFour(x, y, opponent, _board);
-    score += score_threat_four * 1.0 * countThreatFour(x, y, opponent, _board);
+    score += score_threat_four * 1 * countThreatFour(x, y, opponent, _board);
     score += score_live_three * 0.9 * countLiveThree(x, y, opponent, _board);
-    score += score_threat_three * 0.8 * countThreatThree(x, y, opponent, _board);
+    score += score_threat_three * 0.7 * countThreatThree(x, y, opponent, _board);
     score += score_live_two * 0.5 * countLiveTwo(x, y, opponent, _board);
     
     if(hasDoubleThreeThreat(x, y, opponent, _board)) {
