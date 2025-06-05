@@ -536,13 +536,15 @@ function placeMove(x, y, player) {
 
 async function handleCellClick(x, y) {
     if(!gameRunning || (aiEnabled && current_player === -1)) return;
-    
+    if(stepCount === 0){
+        input_x = x;
+        input_y = y;
+    }
     if(placeMove(x, y, current_player)) {
         stepCount++;
         
         if(current_player === 1) {
             addLog(`Player move: (${x},${y})`, 'player-move');
-            
             if(stepCount >= 3) {
                 const score = evaluatePosition(x, y, current_player, board);
                 document.getElementById('move-score').textContent = score;
@@ -655,7 +657,7 @@ function toggleAI() {
         addLog("AI disabled - Two player mode");
     }
 }
-
+/*
 // Store player input coordinates for AI opening strategy
 function updatePlayerInput(x, y) {
     input_x = x;
@@ -673,3 +675,4 @@ handleCellClick = async function(x, y) {
 
 // Initialize game when DOM is loaded
 document.addEventListener('DOMContentLoaded', initGame);
+*/
