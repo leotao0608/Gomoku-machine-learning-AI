@@ -570,14 +570,18 @@ async function handleAIMove() {
     if(stepCount === 2) {
         // Simple opening strategy
         const offsets = [-1, 0, 1];
-        const dx = offsets[Math.floor(Math.random() * 3)];
-        const dy = offsets[Math.floor(Math.random() * 3)];
+        let dx = offsets[Math.floor(Math.random() * 3)];
+        let dy = offsets[Math.floor(Math.random() * 3)];
+        while(isValidPos(input_x+dx, input_y+dy)||(dx===0&&dy===0)){
+            dx = offsets[Math.floor(Math.random() * 3)];
+            dy = offsets[Math.floor(Math.random() * 3)];
+        }
         best_move = [input_x + dx, input_y + dy];
         
-        if(!isValidPos(best_move[0], best_move[1]) || 
-           board[best_move[0]][best_move[1]] !== 0) {
-            best_move = [Math.floor(board_size/2), Math.floor(board_size/2)];
-        }
+        // if(!isValidPos(best_move[0], best_move[1]) || 
+        //    board[best_move[0]][best_move[1]] !== 0) {
+        //     best_move = [Math.floor(board_size/2), Math.floor(board_size/2)];
+        // }
     } else {
         best_move = await mctsBestMove();
     }
