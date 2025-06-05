@@ -190,12 +190,3 @@ button:hover {
 .log-content::-webkit-scrollbar-thumb:hover {
     background: #00cc00;
 }
-
-.board-container {
-    overflow-x: auto;
-    width: 100%;
-}
-
-.board {
-    width: max-content;
-}
