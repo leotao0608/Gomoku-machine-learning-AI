@@ -575,7 +575,7 @@ async function handleAIMove() {
         let dy = offsets[Math.floor(Math.random() * 3)];
         if(dx==0&&dy==0){
             dx=1;
-            dy=1
+            dy=1;
         }
         
         best_move = [input_x + dx, input_y + dy];
