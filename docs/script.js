@@ -567,7 +567,7 @@ async function handleAIMove() {
     const startTime = performance.now();
     
     let best_move;
-    if(stepCount === 2) {
+    if(stepCount === 1) {
         // Simple opening strategy
         addLog("start simple strategy");
         const offsets = [-1, 0, 1];
