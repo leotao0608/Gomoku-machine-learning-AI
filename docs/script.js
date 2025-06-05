@@ -657,7 +657,7 @@ function toggleAI() {
         addLog("AI disabled - Two player mode");
     }
 }
-/*
+
 // Store player input coordinates for AI opening strategy
 function updatePlayerInput(x, y) {
     input_x = x;
@@ -675,4 +675,4 @@ handleCellClick = async function(x, y) {
 
 // Initialize game when DOM is loaded
 document.addEventListener('DOMContentLoaded', initGame);
-*/
+
