@@ -569,6 +569,7 @@ async function handleAIMove() {
     let best_move;
     if(stepCount === 2) {
         // Simple opening strategy
+        addLog("start simple strategy");
         const offsets = [-1, 0, 1];
         let dx = offsets[Math.floor(Math.random() * 3)];
         let dy = offsets[Math.floor(Math.random() * 3)];
