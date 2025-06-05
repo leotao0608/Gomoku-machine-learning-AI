@@ -3,7 +3,7 @@ An AI-powered Gomoku game implemented in C++ featuring intelligent move selectio
 ## Project Highlits
 - **Language**: C++
 - **Implementation Algrithm:** MinMax + Alpha Beta Pruning + Board Evaluation
-
+      *[Try Game](https://leotao0608.github.io/Gomoku-machine-learning-AI/)*
 ## Introduction to Gomoku
 Gomoku, also known as "Five in a Row" or "Gobang", is a two-player abstract strategy board game played on a 15*15 Go board.  
 In this game, a player win by lining up five chess pieces of the same color, it can be in four directions, vertical, horizontal and 
