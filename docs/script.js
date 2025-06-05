@@ -1,4 +1,3 @@
-// Constants - preserving original typing style
 const C = 1.414;  // UCB exploration parameter
 const simulations = 100;
 const total_candidates = 10;  // add candidates
@@ -354,12 +353,12 @@ function getUrgentMove(player, _board) {
         }
     }
     
-    // Block opponent's threat four
-    for(const [x, y] of candidates) {
-        if(countThreatFour(x, y, opponent, _board) > 0) {
-            return [x, y];
-        }
-    }
+    // // Block opponent's threat four this is actually threat three
+    // for(const [x, y] of candidates) {
+    //     if(countThreatFour(x, y, opponent, _board) > 0) {
+    //         return [x, y];
+    //     }
+    // }
     
     // Create live three
     for(const [x, y] of candidates) {
@@ -367,20 +366,26 @@ function getUrgentMove(player, _board) {
             return [x, y];
         }
     }
-    
+    // //oponent's live three
+    // for(const [x, y] of candidates) {
+    //     if(countLiveThree(x, y, opponent, _board) > 0) {
+    //         return [x, y];
+    //     }
+    // }
+    //bug below?
     // Block opponent's live three (prioritized)
-    const threat_moves = [];
-    for(const [x, y] of candidates) {
-        const live_three_count = countLiveThree(x, y, opponent, _board);
-        if(live_three_count > 0) {
-            threat_moves.push([[x, y], live_three_count]);
-        }
-    }
+    // const threat_moves = [];
+    // for(const [x, y] of candidates) {
+    //     const live_three_count = countLiveThree(x, y, opponent, _board);
+    //     if(live_three_count > 0) {
+    //         threat_moves.push([[x, y], live_three_count]);
+    //     }
+    // }
     
-    if(threat_moves.length > 0) {
-        threat_moves.sort((a, b) => b[1] - a[1]);
-        return threat_moves[0][0];
-    }
+    // if(threat_moves.length > 0) {
+    //     threat_moves.sort((a, b) => b[1] - a[1]);
+    //     return threat_moves[0][0];
+    // }
     
     return [-1, -1];
 }
