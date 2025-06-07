@@ -1,4 +1,4 @@
-
+#this code trains the model
 #Tensor flow library, numpy
 import tensorflow as tf
 from tensorflow.keras.models import Sequential
