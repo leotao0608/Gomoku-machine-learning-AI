@@ -549,7 +549,7 @@ void saveTrainingData(const vector<vector<int>>& board_state, int best_x, int be
     training_dataset.push_back(data);
 }
 
-void saveDatasetToFile(const string& x_filename, const string& y_filename) {
+void saveDatasetToFile() {
     cout << "Saving " << training_dataset.size() << " training samples...\n";
     
     // save as json, for python
@@ -579,7 +579,7 @@ void saveDatasetToFile(const string& x_filename, const string& y_filename) {
     }
     
     // save
-    ofstream file("training_data.json");
+    ofstream file("training_data_1.json");
     file << dataset_json.dump(2);
     file.close();
     
@@ -626,7 +626,7 @@ void playOneGame() {
         board[best_move.first][best_move.second] = current_player;
         current_player = switchPlayer(current_player);
 //        clearBoard();
-//        printBoard(board);										show current board status
+//        printBoard(board);										//show current board status
         if(steps > 200) break;//if too many moves, break
     }
     
@@ -643,18 +643,20 @@ int main() {
     cin >> num_games;
     
     cout << "Generating training data from " << num_games << " self-play games...\n";
-    
-    for(int game = 0; game < num_games; game++) {
-        cout << "\rPlaying game " << (game + 1) << "/" << num_games;
+    for(int game = 1; game <= num_games; game++) {
+        cout << "\rPlaying game " << (game) << "/" << num_games;
         cout.flush();
         
         playOneGame();
+        
+		
+		
     }
     
     cout << "\n\nGames completed! Total training samples: " << training_dataset.size() << "\n";
     
     // save data
-    saveDatasetToFile("x_train.npz", "y_train.npz");
+    saveDatasetToFile();
     
     return 0;
 }
