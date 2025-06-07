@@ -1,0 +1,35 @@
+import json
+import numpy as np
+#convert json to npz, and convert player
+
+json_file = "C:/Users/Lisaq/Documents/gomoku AI/self play code/trainning data offensive moves 1/training_data_offensive_moves_1.json"
+
+x_list = []
+y_list = []
+
+
+with open(json_file, "r") as f:
+    steps = json.load(f)
+
+for i, step in enumerate(steps):
+
+    board = np.array(step["board"], dtype=np.float32)
+    move_x = step["move_x"]
+    move_y = step["move_y"]
+    player = step["player"]
+
+    board = board * player  
+
+    move_index = move_x * 15 + move_y
+    move_onehot = np.zeros(225, dtype=np.float32)
+    move_onehot[move_index] = 1.0
+
+    x_list.append(board)
+    y_list.append(move_onehot)
+
+X = np.array(x_list).reshape(-1, 15, 15, 1)
+Y = np.array(y_list)
+
+
+np.savez("C:/Users/Lisaq/Documents/gomoku AI/self play code/x_train.npz", X)
+np.savez("C:/Users/Lisaq/Documents/gomoku AI/self play code/y_train.npz", Y)
