@@ -1,4 +1,4 @@
-#uses MCTS AI self play data to train
+#uses MCTS AI self play data to train, this code creates the neural network
 import tensorflow as tf
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Conv2D, Dense, Flatten
