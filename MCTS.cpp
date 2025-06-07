@@ -402,26 +402,7 @@ pair<int, int> getUrgentMove(int player, const vector<vector<int>>& _board) {
             return {x, y};
         }
     }
-    
-    for(auto [x, y] : candidates) {
-        if(countLiveThree(x, y, player, _board) > 0) {
-            return {x, y};
-        }
-    }
-    vector<pair<pair<int, int>, int>> threat_moves;
-    for(auto [x, y] : candidates) {
-        int live_three_count = countLiveThree(x, y, opponent, _board);
-        if(live_three_count > 0) {
-            threat_moves.push_back({{x, y}, live_three_count});
-        }
-    }
-    
-    if(!threat_moves.empty()) {
-        sort(threat_moves.begin(), threat_moves.end(), 
-             [](const auto& a, const auto& b) { return a.second > b.second; });
-        return threat_moves[0].first;
-    }
-    
+
     return {-1, -1};  
 }
 
