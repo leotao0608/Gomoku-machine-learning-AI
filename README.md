@@ -1,9 +1,13 @@
 # **Gomoku AI**
 An AI-powered Gomoku game implemented in C++ featuring intelligent move selection using Minimax algorithm with Alpha-Beta pruning. 
 ## Project Highlits
-- **Language**: C++
+- **Language:** C++
 - **Implementation Algrithm:** MinMax + Alpha Beta Pruning + Board Evaluation
-  
+- **About This Project:** This is a Gomoku (five-in-a-row) game with an intelligent computer player, developed in C++. The AI can challenge human players by evaluating moves using offensive and defensive strategies. The goal is to create a smart and efficient game engine and later expand it with machine learning.
+- **What Can It Do:**
+  - Play against a human  
+  - Attach and defend intelligently
+  - Find a move with highest winnign rate
 ## **[Try Game](https://leotao0608.github.io/Gomoku-machine-learning-AI/)**
 ## Introduction to Gomoku
 Gomoku, also known as "Five in a Row" or "Gobang", is a two-player abstract strategy board game played on a 15*15 Go board.  
