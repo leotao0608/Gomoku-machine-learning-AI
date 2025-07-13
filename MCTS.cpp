@@ -283,7 +283,7 @@ int evaluatePosition(int x, int y, int player, const vector<vector<int>>& _board
     score += score_five * 1.1 * (isFiveInRow(x, y, opponent, _board) ? 1 : 0);
     score += score_live_four * 1.1 * countLiveFour(x, y, opponent, _board);
     score += score_threat_four * 1.0 * countThreatFour(x, y, opponent, _board);
-    score += score_live_three * 0.9 * countLiveThree(x, y, opponent, _board);  // 提高活三防守权重
+    score += score_live_three * 0.9 * countLiveThree(x, y, opponent, _board);
     score += score_threat_three * 0.8 * countThreatThree(x, y, opponent, _board);
     score += score_live_two * 0.6 * countLiveTwo(x, y, opponent, _board);
     
